@@ -16,5 +16,5 @@
 
 <!-- target:s-input -->
 <!-- if: ${pos} == 'start' -->
-<input class="r-input" <!-- if: ${attrs}.disabled.value == 'disabled' --> disabled<!-- /if -->  />
+<input class="r-input" <!-- if: ${attrs}.disabled === '' || ${attrs}.disabled == 'disabled' -->disabled<!-- /if --> />
 <!-- /if -->

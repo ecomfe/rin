@@ -11,6 +11,6 @@ var testPath = path.resolve(__dirname, 'test.html');
 
 var before = fs.readFileSync(testPath, 'utf-8'); 
 
-var after = rin.parse(before);
+var after = rin.compile(before);
 
 console.log( ['', 'before:', before, '', 'after:', after].join('\n') );
