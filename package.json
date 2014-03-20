@@ -1,0 +1,22 @@
+{
+    "name": "rin",
+    "version": "0.0.1",
+    "description": "rin component",
+    "maintainers": [{
+        "name": "junmer",
+        "email": "junmer@foxmail.com"
+    }],
+    "scripts": {
+        "test": "node test/test.js"
+    },
+    "main": "main",
+    "dependencies": {
+        "etpl": "2.0.10"
+    },
+    "keywords": [
+        "tag",
+        "component"
+    ],
+    "repository": "git://github.com/ecomfe/rin.git",
+    "license": "MIT"
+}

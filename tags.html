@@ -1,0 +1,20 @@
+<!-- target:s-btn -->
+<!-- if: ${pos} == 'start' -->
+<button class="r-btn">
+<!-- /if -->
+<!-- if: ${pos} == 'end' -->
+</button>
+<!-- /if -->
+
+<!-- target:s-nav -->
+<!-- if: ${pos} == 'start' -->
+<nav class="r-nav">
+<!-- /if -->
+<!-- if: ${pos} == 'end' -->
+</nav>
+<!-- /if -->
+
+<!-- target:s-input -->
+<!-- if: ${pos} == 'start' -->
+<input class="r-input" <!-- if: ${attrs}.disabled.value == 'disabled' --> disabled<!-- /if -->  />
+<!-- /if -->
