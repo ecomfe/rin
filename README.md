@@ -8,7 +8,7 @@ Usage
 
 通过 `npm` 安装
 
-    npm intall rin
+    npm install rin
 
 simple demo
 ```javascript
