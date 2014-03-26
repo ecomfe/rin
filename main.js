@@ -15,36 +15,13 @@ var htmlparser  = require('htmlparser2');
  * 标签模板
  * @type {string}
  */
-var tagsTpl = fs.readFileSync(path.resolve(__dirname, 'tags.html'), 'utf-8');
-
-// 去tagsTpl \n\r  etpl 支持前先人肉吧
-tagsTpl = tagsTpl.replace(/\r?\n/g, '');
+var tagsTpl = '';
 
 /**
  * etplEngine
  * @type {Object}
  */
 var etplEngine  = etpl;
-
-
-/**
- * 对象属性拷贝
- * 
- * @inner
- * @param {Object} target 目标对象
- * @param {Object} source 源对象
- * @return {Object} 返回目标对象
- */
-function extend(target, source) {
-
-    for (var key in source) {
-        if (source.hasOwnProperty(key)) {
-            target[key] = source[key];
-        }
-    }
-
-    return target;
-}
 
 /**
  * 字符串转对象 MAP
@@ -87,6 +64,65 @@ function isXTag(tag) {
 }
 
 /**
+ * 标签属性toString
+ * @param  {Object} attrs 标签对象
+ * @return {string}       转换结果
+ */
+function attrsStringify(attrs) {
+
+    var output = [];
+
+    for (var key in attrs) {
+        if (attrs[key]) {
+            output.push(key + '="' + attrs[key] + '"');
+        } 
+        else if (attrs[key] === '') {
+            output.push(key);
+        }
+    }
+
+    return output.length > 0 ? ' ' + output.join(' ') : '';
+
+}
+
+/**
+ * 处理正常标签
+ *
+ * @inner
+ * @param  {string} pos   'start|end'
+ * @param  {string} tag   标签名
+ * @param  {Object} attrs 属性
+ * @param  {boolean} unary 是否补结束位
+ * @return {string}       结果
+ */
+function parseHtmlTag(pos, tag, attrs, unary) {
+
+    var results = '';
+
+    if (pos === 'start') {
+
+        results += ''
+            + '<' 
+            + tag;
+
+        results += ''
+            + attrsStringify(attrs);
+
+        results += ''
+            + (unary ? ' /' : '') 
+            + '>';
+
+    }
+    else if (pos === 'end') {
+
+        results += '</' + tag + '>';
+
+    }
+    
+    return results;
+}
+
+/**
  * 处理特殊标签
  *
  * @inner
@@ -100,17 +136,14 @@ function parseXTag(pos, tag, attrs, unary) {
 
     var xtagRender = etplEngine.getRenderer(tag);
 
-    // 默认attr
-    var _attrs = {
-        disabled: false
-        // @todo 待扩展
-    };
-
-    extend(_attrs, attrs);
+    // 找不到 xtag 按普通标签处理
+    if (!xtagRender) {
+        return parseHtmlTag(pos, tag, attrs, unary);
+    }
 
     var data = {
         pos: pos,
-        attrs: _attrs,
+        attrs: attrs,
         unary: unary
     };
 
@@ -135,35 +168,11 @@ function parseTag(pos, tag, attrs, unary) {
         return parseXTag(pos, tag, attrs, unary);
 
     }
+    else {
 
-    var results = '';
-
-    if (pos === 'start') {
-
-        results += ''
-            + '<' 
-            + tag;
-
-        for (var key in attrs) {
-            results += ' '
-                + key
-                + '="'
-                + attrs[key]
-                + '"';
-        }
-
-        results += ''
-            + (unary ? ' /' : '') 
-            + '>';
+        return parseHtmlTag(pos, tag, attrs, unary);
 
     }
-    else if (pos === 'end') {
-
-        results += '</' + tag + '>';
-
-    }
-    
-    return results;
 
 }
 
@@ -174,8 +183,6 @@ function parseTag(pos, tag, attrs, unary) {
  * @return {string}        结果
  */
 function parseTpl(source) {
-
-    etplEngine.compile(tagsTpl);
 
     var results = '';
 
@@ -202,19 +209,46 @@ function parseTpl(source) {
 }
 
 /**
+ * 替换标签
+ * 
+ * @param {string} tpl 标签模板
+ */
+function replaceTagTpl(tpl) {
+
+    tagsTpl = tpl;
+
+    etplEngine = new etpl.Engine();
+
+    etplEngine.compile(tagsTpl);
+
+}
+
+/**
  * 扩展标签
  * 
  * @param {string} tpl 标签模板
  */
 function addTagTpl(tpl) {
 
-    etplEngine = new etpl.Engine();
-
-    tagsTpl += tpl;
+    replaceTagTpl(tagsTpl + tpl);
+    
 }
+
+/**
+ * 自带标签
+ * @type {string}
+ */
+var defaultTpl = fs.readFileSync(path.resolve(__dirname, 'tags.html'), 'utf-8');
+
+// defaultTpl \n\r  etpl 支持前先人肉吧
+defaultTpl = defaultTpl.replace(/\r?\n/g, '');
+
+// init
+replaceTagTpl(defaultTpl);
 
 // exports
 exports.etpl    = etplEngine;
+exports.replace = replaceTagTpl;
 exports.add     = addTagTpl;
 exports.compile = exports.parse = parseTpl;
 
